@@ -27,7 +27,8 @@ export default {
   css: [],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: [],
+  // pluginsのディレクトリに配置したファイルを記載して、リロードするたびに毎回呼び出す
+  plugins: ["@/plugins/authCheck"],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
