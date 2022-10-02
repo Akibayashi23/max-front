@@ -1,5 +1,8 @@
 <template>
   <v-app dark>
+    <div>
+      <Loading />
+    </div>
     <v-navigation-drawer
       v-model="drawer"
       :mini-variant="miniVariant"
