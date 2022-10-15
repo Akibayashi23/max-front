@@ -28,7 +28,7 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   // pluginsのディレクトリに配置したファイルを記載して、リロードするたびに毎回呼び出す
-  plugins: ["@/plugins/authCheck"],
+  plugins: ["@/plugins/authCheck", "@/plugins/vuetify"],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
