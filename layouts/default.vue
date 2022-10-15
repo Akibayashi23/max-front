@@ -98,6 +98,11 @@ export default {
             title: "MYPAGE",
             to: "/mypage",
           },
+          {
+            icon: "mdi-chart-bubble",
+            title: "CALENDAR",
+            to: "/calendar",
+          },
         ];
       } else {
         return [
