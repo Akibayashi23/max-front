@@ -42,6 +42,19 @@ export default {
       });
     },
   },
+  // fetchの第一引数には、自動的にcontextオブジェクトが入る
+  // contextオブジェクトとは、リクエスト情報やパラメータなどのデータが入っているオブジェクト
+  // {store, redirect}という形で受け取ると、storeにはVuexのstoreの情報、redirectにはリダイレクトさせるために必要な関数を受け取ることができる
+  fetch({ store, redirect }) {
+    store.watch(
+      (state) => state.auth.currentUser,
+      (newUser, oldUser) => {
+        if (!newUser) {
+          return redirect("/login");
+        }
+      }
+    );
+  },
 };
 </script>
 
