@@ -59,6 +59,13 @@ export default {
         });
 
       if (this.error === null) {
+        this.$store.dispatch("notification/setNotice", {
+          status: true,
+          message: "ログインしました",
+        });
+        setTimeout(() => {
+          this.$store.dispatch("notification/setNotice", {});
+        }, 2000);
         // /loginのページから/へ遷移する
         this.$router.push("/");
       }
