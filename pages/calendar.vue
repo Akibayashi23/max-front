@@ -1,16 +1,25 @@
 <template>
   <div>
     <h1>Calendar</h1>
-    <p>events:</p>
-    <p>{{ events }}</p>
+    <ul>
+      <li v-for="event in events" :key="event.id">
+        {{ event.name }}
+      </li>
+    </ul>
     <v-btn type="submit" @click="fetchEvents()">fetchEvents</v-btn>
+    <CalendarDetails />
   </div>
 </template>
 
 <script>
 // import firebase from "@/plugins/firebase";
 import axios from "axios"; // axiosをインポートする
+// import { mapGetters, mapActions } from "vuex";
+import CalendarDetails from "@/components/calendar/Detail";
 export default {
+  components: {
+    CalendarDetails,
+  },
   name: "Calendar",
   data: () => ({
     events: [],
@@ -19,6 +28,9 @@ export default {
     user() {
       return this.$store.state.auth.currentUser;
     },
+    // mapGettersでcomputedを呼ぶ
+    // stateに保存された値をmapGettersでimportしたeventsゲッターで取得し、ビューに表示
+    // ...mapGetters("events", ["events"]),
   },
   methods: {
     // async logOut() {
@@ -42,6 +54,9 @@ export default {
           console.error(error);
         });
     },
+    // mapActionsでmethodsで呼ぶ
+    // ボタンを押すと、mapActionsでimportしたストアのfetchEventsアクションが実行されてデータを取得し、stateに保存
+    // ...mapActions("events", ["fetchEvents"]),
   },
   fetch({ store, redirect }) {
     store.watch(
