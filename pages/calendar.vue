@@ -31,16 +31,55 @@
       ></v-calendar>
     </v-sheet>
     <!-- ダイアログ -->
-    <v-dialog :value="event !== null">
+    <!-- widthの指定 -->
+    <!-- ダイアログの外側をクリックした際にもダイアログを閉じる -->
+    <v-dialog :value="event !== null" @click:outside="closeDialog" width="600">
       <div v-if="event !== null">
-        <v-card>
-          <h1>イベント詳細</h1>
-          <p>name: {{ event.name }}</p>
-          <p>start: {{ event.start.toLocaleString() }}</p>
-          <p>end: {{ event.end.toLocaleString() }}</p>
-          <p>timed: {{ event.timed }}</p>
-          <p>description: {{ event.description }}</p>
-          <p>color: {{ event.color }}</p>
+        <!-- 余白の指定 -->
+        <v-card class="pb-12">
+          <v-card-actions class="d-flex justify-end pa-2">
+            <!-- ダイアログを閉じる動作 -->
+            <v-btn icon @click="closeDialog">
+              <!-- バツアイコン -->
+              <v-icon size="20px">mdi-close</v-icon>
+            </v-btn>
+          </v-card-actions>
+          <v-card-title>
+            <v-row>
+              <!-- 中央寄せ -->
+              <v-col cols="2" class="d-flex justify-center align-center">
+                <!-- color属性の値がnullの場合はblueを指定 -->
+                <v-icon size="20px" :color="event.color || 'blue'"
+                  >mdi-square</v-icon
+                >
+              </v-col>
+              <v-col class="d-flex align-center">
+                {{ event.name }}
+              </v-col>
+            </v-row>
+          </v-card-title>
+          <v-card-text>
+            <v-row>
+              <!-- 中央寄せ -->
+              <v-col cols="2" class="d-flex justify-center align-center">
+                <v-icon size="20px">mdi-clock-time-three-outline</v-icon>
+              </v-col>
+              <v-col class="d-flex align-center">
+                {{ event.start.toLocaleString() }} ~
+                {{ event.end.toLocaleString() }}
+              </v-col>
+            </v-row>
+          </v-card-text>
+          <v-card-text>
+            <v-row>
+              <v-col cols="2" class="d-flex justify-center align-center">
+                <v-icon size="20px">mdi-card-text-outline</v-icon>
+              </v-col>
+              <v-col class="d-flex align-center">
+                {{ event.description || "no description" }}
+              </v-col>
+            </v-row>
+          </v-card-text>
         </v-card>
       </div>
     </v-dialog>
@@ -82,6 +121,10 @@ export default {
     },
     showEvent({ event }) {
       this.setEvent(event);
+    },
+    // eventステートにnullを代入することでダイアログを非表示にすることができる
+    closeDialog() {
+      this.setEvent(null);
     },
   },
   fetch({ store, redirect }) {
