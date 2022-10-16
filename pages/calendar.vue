@@ -18,6 +18,9 @@
         :month-format="
           (timestamp) => new Date(timestamp.date).getMonth() + 1 + ' /'
         " -->
+
+      <!-- カレンダーの一つのセルがクリックされた時に実行する処理を指定できる -->
+      <!-- click:day="initEvent" -->
       <v-calendar
         ref="calendar"
         v-model="value"
@@ -29,13 +32,15 @@
           (timestamp) => new Date(timestamp.date).getMonth() + 1 + ' /'
         "
         @click:event="showEvent"
+        @click:day="initEvent"
       ></v-calendar>
     </v-sheet>
     <!-- ダイアログ -->
     <!-- widthの指定 -->
     <!-- ダイアログの外側をクリックした際にもダイアログを閉じる -->
     <v-dialog :value="event !== null" @click:outside="closeDialog" width="600">
-      <EventDetailDialog v-if="event !== null" />
+      <EventDetailDialog v-if="event !== null && !isEditMode" />
+      <EventFormDialog v-if="event !== null && isEditMode" />
     </v-dialog>
   </div>
 </template>
@@ -47,6 +52,7 @@ import { format } from "date-fns";
 import { mapGetters, mapActions } from "vuex";
 // calendar.vue > EventDetailDialog.vue > DialogSection.vueでコンポーネントを呼び出す
 import EventDetailDialog from "@/components/calendar/EventDetailDialog";
+import EventFormDialog from "@/components/calendar/EventFormDialog";
 // import CalendarDetails from "@/components/calendar/Detail";
 
 export default {
@@ -56,6 +62,7 @@ export default {
   name: "Calendar",
   components: {
     EventDetailDialog,
+    EventFormDialog,
   },
   data: () => ({
     value: format(new Date(), "yyyy/MM/dd"),
@@ -66,7 +73,7 @@ export default {
     },
     // mapGettersでcomputedを呼ぶ
     // stateに保存された値をmapGettersでimportしたeventsゲッターで取得し、ビューに表示
-    ...mapGetters("events", ["events", "event"]),
+    ...mapGetters("events", ["events", "event", "isEditMode"]),
     title() {
       return format(new Date(this.value), "yyyy年 M月");
     },
@@ -74,16 +81,31 @@ export default {
   methods: {
     // mapActionsでmethodsで呼ぶ
     // ボタンを押すと、mapActionsでimportしたストアのfetchEventsアクションが実行されてデータを取得し、stateに保存
-    ...mapActions("events", ["fetchEvents", "setEvent"]),
+    ...mapActions("events", ["fetchEvents", "setEvent", "setEditMode"]),
     setToday() {
       this.value = format(new Date(), "yyyy/MM/dd");
     },
-    showEvent({ event }) {
+    showEvent({ nativeEvent, event }) {
       this.setEvent(event);
+      // 予定をクリックしてshowEventを実行した後にinitEventを実行させないようにする対策
+      nativeEvent.stopPropagation();
     },
+    // closeDialogメソッドを実行したらisEditModeをfalseに戻すようにした
     // eventステートにnullを代入することでダイアログを非表示にすることができる
     closeDialog() {
       this.setEvent(null);
+      this.setEditMode(false);
+    },
+    // initEventメソッドを実行したらisEditModeをtrueにセットすることでフォームを表示するようにした
+    // 引数のdateにはクリックした場所の日付が2022-10-16のような文字列で渡ってくる
+    initEvent({ date }) {
+      // ハイフンをスラッシュに置換して2022/10/16のような文字列に変換
+      // safariではnew Date('2022-10-16')を実行するとエラーになるため。(なおchromeやfirefoxではエラーにならない。)
+      date = date.replace(/-/g, "/");
+      const start = format(new Date(date), "yyyy/MM/dd 00:00:00");
+      const end = format(new Date(date), "yyyy/MM/dd 01:00:00");
+      this.setEvent({ name: "", start, end, timed: true });
+      this.setEditMode(true);
     },
   },
   fetch({ store, redirect }) {
